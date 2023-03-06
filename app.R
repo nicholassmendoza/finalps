@@ -42,7 +42,7 @@ ui <- fluidPage(
              tableOutput("sample_table")),
     
     tabPanel("Plot",
-             titlePanel("Tuition by State"),
+             titlePanel("Average Tuition by State"),
              sidebarPanel(
                fluidRow(
                  column(4,
@@ -60,16 +60,15 @@ ui <- fluidPage(
     tabPanel("Table",
              titlePanel("Average Tuition by Type of College for Each State"),
              sidebarPanel(
-               fluidRow(
-                 column(10,
-                        radioButtons(inputId = "tabletype" , label = "Select the type of college", choices = c("Public In-State", "Public Out-of-State", "Private"))
-                 ),
-               )
+               radioButtons(inputId = "tabletype" , label = "Select the type of college", choices = c("Public In-State", "Public Out-of-State", "Private"))
              ),
              mainPanel(
+               textOutput("tableObservation"),
                dataTableOutput("mytable")
-             ),
+             )
     )
+    
+    
   ),
 )
 server <- function(input, output) {
@@ -117,6 +116,19 @@ server <- function(input, output) {
       
     }
   })
+  output$tableObservation <- renderPrint({
+    if (input$tabletype == "Public In-State") {
+      cat("Top 5 states with the highest average cost for Public In-State colleges:\n")
+      print(as.data.frame(toppublicinstate[1:5,]))
+    } else if (input$tabletype == "Public Out-of-State") {
+      cat("Top 5 states with the highest average cost for Public Out-of-State colleges:\n")
+      print(as.data.frame(toppublicoutofstate[1:5,]))
+    } else if (input$tabletype == "Private") {
+      cat("Top 5 states with the highest average cost for Private colleges:\n")
+      print(as.data.frame(topprivate[1:5,]))
+    }
+  })
+  
 }
 
 shinyApp(ui = ui, server = server)
